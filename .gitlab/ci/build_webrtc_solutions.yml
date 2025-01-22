@@ -1,0 +1,64 @@
+.build_template:
+  artifacts:
+    expire_in: 4 days
+    paths:
+    - ${CI_PROJECT_DIR}/solutions/$CI_BUILD_FOLDER/build*/size.json
+    - ${CI_PROJECT_DIR}/solutions/$CI_BUILD_FOLDER/build*/build_log.txt
+    - ${CI_PROJECT_DIR}/solutions/$CI_BUILD_FOLDER/build*/*.bin
+    - ${CI_PROJECT_DIR}/solutions/$CI_BUILD_FOLDER/build*/*.elf
+    - ${CI_PROJECT_DIR}/solutions/$CI_BUILD_FOLDER/build*/flasher_args.json
+    - ${CI_PROJECT_DIR}/solutions/$CI_BUILD_FOLDER/build*/flash_project_args
+    - ${CI_PROJECT_DIR}/solutions/$CI_BUILD_FOLDER/build*/config/sdkconfig.json
+    - ${CI_PROJECT_DIR}/solutions/$CI_BUILD_FOLDER/build*/sdkconfig
+    - ${CI_PROJECT_DIR}/solutions/$CI_BUILD_FOLDER/build*/bootloader/*.bin
+    - ${CI_PROJECT_DIR}/solutions/$CI_BUILD_FOLDER/build*/partition_table/*.bin
+    - ${CI_PROJECT_DIR}/solutions/$CI_BUILD_FOLDER/*.py
+  before_script:
+  - export OPENAI_API_KEY=FAKE_KEY_FOR_BUILD_ONLY
+  script:
+  - run_cmd python ${BASE_FRAMEWORK_PATH}/tools/ci/ci_build_apps.py ${CI_PROJECT_DIR}/solutions/$CI_BUILD_FOLDER
+    -vv -t $IDF_TARGET --pytest-apps
+build_doorbell_demo_esp32p4:
+  extends: .build_template
+  stage: build
+  variables:
+    CI_BUILD_FOLDER: doorbell_demo
+    IDF_TARGET: esp32p4
+build_doorbell_demo_esp32s3:
+  extends: .build_template
+  stage: build
+  variables:
+    CI_BUILD_FOLDER: doorbell_demo
+    IDF_TARGET: esp32s3
+build_openai_demo_esp32s3:
+  extends: .build_template
+  stage: build
+  variables:
+    CI_BUILD_FOLDER: openai_demo
+    IDF_TARGET: esp32s3
+build_peer_demo_esp32:
+  extends: .build_template
+  stage: build
+  variables:
+    CI_BUILD_FOLDER: peer_demo
+    IDF_TARGET: esp32
+build_peer_demo_esp32s2:
+  extends: .build_template
+  stage: build
+  variables:
+    CI_BUILD_FOLDER: peer_demo
+    IDF_TARGET: esp32s2
+build_peer_demo_esp32s3:
+  extends: .build_template
+  stage: build
+  variables:
+    CI_BUILD_FOLDER: peer_demo
+    IDF_TARGET: esp32s3
+stages:
+- build
+variables:
+  BASE_FRAMEWORK: $IDF_REPOSITORY
+  BASE_FRAMEWORK_PATH: $CI_PROJECT_DIR/esp-idf
+  DOCKER_IMAGE: ${CI_DOCKER_REGISTRY}/esp-env-v5.4:1
+  IDF_TAG_FLAG: false
+  IDF_VERSION_TAG: v5.4
