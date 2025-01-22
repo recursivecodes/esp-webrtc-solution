@@ -1,0 +1,50 @@
+/* General settings
+
+   This example code is in the Public Domain (or CC0 licensed, at your option.)
+
+   Unless required by applicable law or agreed to in writing, this
+   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+   CONDITIONS OF ANY KIND, either express or implied.
+*/
+
+#pragma once
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * @brief  Board name setting refer to `codec_board` README.md for more details
+ */
+#define TEST_BOARD_NAME "ESP32_P4_DEV_V14"
+
+/**
+ * @brief  Video resolution settings
+ */
+#define VIDEO_WIDTH  1920
+#define VIDEO_HEIGHT 1080
+#define VIDEO_FPS    30
+
+/**
+ * @brief  Set for wifi ssid
+ */
+#define WIFI_SSID     "XXXX"
+
+/**
+ * @brief  Set for wifi password
+ */
+#define WIFI_PASSWORD "XXXX"
+
+/**
+ * @brief  Whether enable data channel
+ */
+#define DATA_CHANNEL_ENABLED (false)
+
+/**
+ * @brief  GPIO for ring button
+ */
+#define DOOR_BELL_RING_BUTTON  35
+
+#ifdef __cplusplus
+}
+#endif
