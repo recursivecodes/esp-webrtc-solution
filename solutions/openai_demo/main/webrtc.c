@@ -12,6 +12,7 @@
 #include "driver/gpio.h"
 #include "esp_log.h"
 #include "esp_webrtc_defaults.h"
+#include "esp_peer_default.h"
 #include "common.h"
 #include <cJSON.h>
 
@@ -515,6 +516,9 @@ int start_webrtc(void)
         esp_webrtc_close(webrtc);
         webrtc = NULL;
     }
+    esp_peer_default_cfg_t peer_cfg = {
+        .agent_recv_timeout = 500,
+    };
     esp_webrtc_cfg_t cfg = {
         .peer_cfg = {
             .audio_info = {
@@ -529,6 +533,8 @@ int start_webrtc(void)
             .audio_dir = ESP_PEER_MEDIA_DIR_SEND_RECV,
             .enable_data_channel = DATA_CHANNEL_ENABLED,
             .on_custom_data = webrtc_data_handler,
+            .extra_cfg = &peer_cfg,
+            .extra_size = sizeof(peer_cfg),
         },
         .signaling_cfg.extra_cfg = OPENAI_API_KEY,
         .peer_impl = esp_peer_get_default_impl(),
