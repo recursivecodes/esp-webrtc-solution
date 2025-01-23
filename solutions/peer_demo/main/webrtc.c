@@ -10,6 +10,7 @@
 #include "media_lib_os.h"
 #include "esp_log.h"
 #include "esp_webrtc_defaults.h"
+#include "esp_peer_default.h"
 #include "common.h"
 #include "esp_timer.h"
 #include "esp_random.h"
@@ -164,7 +165,10 @@ static void pc_task(void *arg)
 static int signaling_ice_info_handler(esp_peer_signaling_ice_info_t* info, void* ctx)
 {
     if (peer == NULL) {
-        esp_peer_cfg_t peer_cfg = {
+        esp_peer_default_cfg_t peer_cfg = {
+            .agent_recv_timeout = 500,
+        };
+        esp_peer_cfg_t cfg = {
             .server_lists = &info->server_info,
             .server_num = 1,
             .audio_dir = ESP_PEER_MEDIA_DIR_SEND_RECV,
@@ -181,8 +185,10 @@ static int signaling_ice_info_handler(esp_peer_signaling_ice_info_t* info, void*
             .on_audio_data = peer_audio_data_handler,
             .on_data = peer_data_handler,
             .ctx = ctx,
+            .extra_cfg = &peer_cfg,
+            .extra_size = sizeof(esp_peer_default_cfg_t),
         };
-        int ret = esp_peer_open(&peer_cfg, esp_peer_get_default_impl(), &peer);
+        int ret = esp_peer_open(&cfg, esp_peer_get_default_impl(), &peer);
         if (ret != ESP_PEER_ERR_NONE) {
             return ret;
         }

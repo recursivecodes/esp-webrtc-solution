@@ -13,6 +13,7 @@
 #include "common.h"
 #include "esp_log.h"
 #include "esp_webrtc_defaults.h"
+#include "esp_peer_default.h"
 
 #define TAG "DOOR_BELL"
 
@@ -163,6 +164,9 @@ int start_webrtc(char *url)
     media_lib_thread_handle_t key_thread;
     media_lib_thread_create_from_scheduler(&key_thread, "Key", key_monitor_thread, NULL);
 
+    esp_peer_default_cfg_t peer_cfg = {
+        .agent_recv_timeout = 500,
+    };
     esp_webrtc_cfg_t cfg = {
         .peer_cfg = {
             .audio_info = {
@@ -185,6 +189,8 @@ int start_webrtc(char *url)
             .on_custom_data = door_bell_on_cmd,
             .enable_data_channel = DATA_CHANNEL_ENABLED,
             .no_auto_reconnect = true, // No auto connect peer when signaling connected
+            .extra_cfg = &peer_cfg,
+            .extra_size = sizeof(peer_cfg),
         },
         .signaling_cfg = {
             .signal_url = url,
