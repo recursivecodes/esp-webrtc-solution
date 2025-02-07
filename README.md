@@ -22,3 +22,6 @@ This demo implements a doorbell application that can:
 
 ### 3. Peer Demo
 This demo mainly show how to use `esp_peer` API to buildup a WebRTC application from scratch.
+
+### 4. Video Call Solution
+This demo show how to use `esp_webrtc` data channel to build up video call application.
