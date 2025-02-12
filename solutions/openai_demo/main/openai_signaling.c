@@ -67,8 +67,9 @@ static int openai_signaling_send_msg(esp_peer_signaling_handle_t h, esp_peer_sig
     } else if (msg->type == ESP_PEER_SIGNALING_MSG_SDP) {
         printf("Receive local SDP\n");
         char content_type[32] = "Content-Type: application/sdp";
-        char auth[128];
-        snprintf(auth, 128, "Authorization: Bearer %s", (char *)sig->cfg.extra_cfg);
+        int len = strlen("Authorization: Bearer ") + strlen((char *)sig->cfg.extra_cfg) + 1;
+        char auth[len];
+        snprintf(auth, len, "Authorization: Bearer %s", (char *)sig->cfg.extra_cfg);
         char *header[] = {
             content_type,
             auth,
