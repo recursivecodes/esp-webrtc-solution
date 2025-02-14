@@ -114,6 +114,18 @@ static int webrtc_event_handler(esp_webrtc_event_t *event, void *ctx)
     return 0;
 }
 
+void send_cmd(char *cmd)
+{
+    if (SAME_STR(cmd, "ring")) {
+        SEND_CMD(webrtc, DOOR_BELL_RING_CMD);
+        ESP_LOGI(TAG, "Ring button on state %d", door_bell_state);
+        if (door_bell_state < DOOR_BELL_STATE_CONNECTING) {
+            door_bell_state = DOOR_BELL_STATE_RINGING;
+            play_tone(DOOR_BELL_TONE_RING);
+        }
+    }
+}
+
 static void key_monitor_thread(void *arg)
 {
     gpio_config_t io_conf;
@@ -134,12 +146,7 @@ static void key_monitor_thread(void *arg)
         if (level != last_level) {
             last_level = level;
             if (level != init_level) {
-                SEND_CMD(webrtc, DOOR_BELL_RING_CMD);
-                ESP_LOGI(TAG, "Ring button on state %d", door_bell_state);
-                if (door_bell_state < DOOR_BELL_STATE_CONNECTING) {
-                    door_bell_state = DOOR_BELL_STATE_RINGING;
-                    play_tone(DOOR_BELL_TONE_RING);
-                }
+                send_cmd("ring");
             }
         }
     }

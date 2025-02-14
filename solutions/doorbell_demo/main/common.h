@@ -48,6 +48,11 @@ void query_webrtc(void);
  */
 int stop_webrtc(void);
 
+/**
+ * @brief  Send command to peer
+ */
+void send_cmd(char *cmd);
+
 #ifdef __cplusplus
 }
 #endif
