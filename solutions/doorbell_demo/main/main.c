@@ -67,6 +67,12 @@ static int leave_room(int argc, char **argv)
     return 0;
 }
 
+static int cmd_cli(int argc, char **argv)
+{
+    send_cmd(argc > 1 ? argv[1] : "ring");
+    return 0;
+}
+
 static int assert_cli(int argc, char **argv)
 {
     *(int *)0 = 0;
@@ -137,6 +143,11 @@ static int init_console()
             .command = "leave",
             .help = "Leave from room\n",
             .func = leave_room,
+        },
+        {
+            .command = "cmd",
+            .help = "Send command (ring etc)\n",
+            .func = cmd_cli,
         },
         {
             .command = "i",
