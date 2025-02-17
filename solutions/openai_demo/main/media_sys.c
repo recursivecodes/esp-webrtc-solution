@@ -10,9 +10,6 @@
 #include "codec_init.h"
 #include "codec_board.h"
 
-#if CONFIG_IDF_TARGET_ESP32P4
-#include "esp_video_init.h"
-#endif
 #include "esp_capture_path_simple.h"
 #include "esp_capture_audio_enc.h"
 #include "av_render.h"
