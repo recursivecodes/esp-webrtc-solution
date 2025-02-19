@@ -44,10 +44,10 @@ extern "C" {
  * @brief  GPIO for ring button
  * 
  * @note  When use ESP32P4-Fuction-Ev-Board, GPIO35(boot button) is connected RMII_TXD1
- *        Which will cause socket error
+ *        When enable `NETWORK_USE_ETHERNET` will cause socket error
  *        User must replace it to a unused GPIO instead (like GPIO27)
  */
-#define DOOR_BELL_RING_BUTTON  35
+#define DOOR_BELL_RING_BUTTON  27
 
 #ifdef __cplusplus
 }
