@@ -34,9 +34,17 @@ After the board boots up, it will attempt to connect to the configured Wi-Fi SSI
 wifi ssid psw
 ```
 
-Once the Wi-Fi is connected successfully, use the `join` command to join a random room. Make sure the room is empty before entering:
+Once connected to Wi-Fi, the board will automatically try to join a room generated from its MAC address. The room name will appear in the console:
 ```
-join mytestroom
+W (9801) Webrtc_Test: Please use browser to join in espxxxxxx on https://webrtc.espressif.cn/doorbell
+```
+User also can use `leave` command leave the room and use the `join` command to join other random room. Make sure the room is empty before entering:
+```
+join random_room_id
+```
+If you're the first to join, you’ll see:
+```
+Initials set to 1
 ```
 
 Then, use a Chrome/Edge browser to enter the same room at [DoorBellDemo](https://webrtc.espressif.cn/doorbell).
@@ -64,3 +72,8 @@ Then, use a Chrome/Edge browser to enter the same room at [DoorBellDemo](https:/
 - **`esp_webrtc_enable_peer_connection` API**: A new API is introduced to manually control the connection and disconnection of the peer connection.
 
 All other steps follow the typical call flow of `esp_webrtc`. For more details on the standard connection build flow, refer to the [Connection Build Flow](../../components/esp_webrtc/README.md#typical-call-sequence-of-esp_webrtc).
+
+### QA
+- If the board unexpectedly leaves the room, fail to re-enter same room.
+  Server will keep the room for 1-2 minutes before timing out. The user must wait for the timeout to expire before retrying.
+

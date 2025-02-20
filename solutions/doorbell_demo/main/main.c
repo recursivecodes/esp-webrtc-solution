@@ -189,6 +189,9 @@ static void thread_scheduler(const char *thread_name, media_lib_thread_cfg_t *th
         thread_cfg->priority = 18;
         thread_cfg->core_id = 1;
     }
+    if (strcmp(thread_name, "start") == 0) {
+        thread_cfg->stack_size = 6 * 1024;
+    }
     if (strcmp(thread_name, "venc") == 0) {
 #if CONFIG_IDF_TARGET_ESP32S3
         thread_cfg->stack_size = 20 * 1024;
@@ -203,9 +206,28 @@ static void thread_scheduler(const char *thread_name, media_lib_thread_cfg_t *th
 #endif
 }
 
+static char* gen_room_id_use_mac(void)
+{
+    static char room_mac[16];
+    uint8_t mac[6];
+    network_get_mac(mac);
+    snprintf(room_mac, sizeof(room_mac)-1, "esp_%02x%02x%02x", mac[3], mac[4], mac[5]);
+    return room_mac;
+}
+
 static int network_event_handler(bool connected)
 {
-    if (connected == false) {
+    if (connected) {
+        // Enter into Room directly
+        RUN_ASYNC(start, {
+            char *room = gen_room_id_use_mac();
+            snprintf(room_url, sizeof(room_url), "https://webrtc.espressif.cn/join/%s", room);
+            ESP_LOGI(TAG, "Start to join in room %s", room);
+            if (start_webrtc(room_url) == 0) {
+                ESP_LOGW(TAG, "Please use browser to join in %s on https://webrtc.espressif.cn/doorbell", room);
+            }
+        });
+    } else {
         stop_webrtc();
     }
     return 0;
