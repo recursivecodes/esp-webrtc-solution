@@ -25,3 +25,6 @@ This demo mainly show how to use `esp_peer` API to buildup a WebRTC application 
 
 ### 4. Video Call Solution
 This demo show how to use `esp_webrtc` data channel to build up video call application.
+
+### 5. WHIP Publisher Solution
+This demo show how to use `esp_webrtc` to publish streaming data to WHIP server.

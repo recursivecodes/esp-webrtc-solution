@@ -21,14 +21,14 @@ extern "C" {
 /**
  * @brief  Video resolution settings
  */
-#define VIDEO_WIDTH  1920
-#define VIDEO_HEIGHT 1080
-#define VIDEO_FPS    30
+#define VIDEO_WIDTH  1024
+#define VIDEO_HEIGHT 600
+#define VIDEO_FPS    10
 
 /**
  * @brief  Set for wifi ssid
  */
-#define WIFI_SSID     "XXXX"
+#define WIFI_SSID "XXXX"
 
 /**
  * @brief  Set for wifi password
@@ -36,18 +36,14 @@ extern "C" {
 #define WIFI_PASSWORD "XXXX"
 
 /**
- * @brief  Whether enable data channel
+ * @brief  WHIP server URL
  */
-#define DATA_CHANNEL_ENABLED (false)
+#define WHIP_SERVER "http://XXXX/whip"
 
 /**
- * @brief  GPIO for ring button
- *
- * @note  When use ESP32P4-Fuction-Ev-Board, GPIO35(boot button) is connected RMII_TXD1
- *        When enable `NETWORK_USE_ETHERNET` will cause socket error
- *        User must replace it to a unused GPIO instead (like GPIO27)
+ * @brief  WHIP server access token
  */
-#define DOOR_BELL_RING_BUTTON  35
+#define WHIP_TOKEN "username:password"
 
 #ifdef __cplusplus
 }

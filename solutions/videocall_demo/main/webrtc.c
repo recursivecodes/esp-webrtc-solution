@@ -45,13 +45,13 @@ typedef enum {
 typedef enum {
     VIDEO_CALL_TONE_RING,
     VIDEO_CALL_TONE_OPEN_DOOR,
-} VIDEO_CALL_tone_type_t;
+} video_call_tone_type_t;
 
 typedef struct {
     const uint8_t *start;
     const uint8_t *end;
     int            duration;
-} VIDEO_CALL_tone_data_t;
+} video_call_tone_data_t;
 
 static esp_webrtc_handle_t webrtc;
 static bool                video_call_initiator;
@@ -61,9 +61,9 @@ static bool                monitor_key;
 extern const uint8_t ring_music_start[] asm("_binary_ring_aac_start");
 extern const uint8_t ring_music_end[] asm("_binary_ring_aac_end");
 
-static int play_tone(VIDEO_CALL_tone_type_t type)
+static int play_tone(video_call_tone_type_t type)
 {
-    VIDEO_CALL_tone_data_t tone_data[] = {
+    video_call_tone_data_t tone_data[] = {
         { ring_music_start, ring_music_end, 4000 },
     };
     if (type >= sizeof(tone_data) / sizeof(tone_data[0])) {
@@ -74,7 +74,7 @@ static int play_tone(VIDEO_CALL_tone_type_t type)
 
 int play_tone_int(int t)
 {
-    return play_tone((VIDEO_CALL_tone_type_t)t);
+    return play_tone((video_call_tone_type_t)t);
 }
 
 static void video_call_change_state(video_call_state_t state)
