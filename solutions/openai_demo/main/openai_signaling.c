@@ -75,7 +75,7 @@ static int openai_signaling_send_msg(esp_peer_signaling_handle_t h, esp_peer_sig
             auth,
             NULL,
         };
-        int ret = https_post(OPENAI_REALTIME_URL, header, (char *)msg->data, openai_sdp_answer, h);
+        int ret = https_post(OPENAI_REALTIME_URL, header, (char *)msg->data, NULL, openai_sdp_answer, h);
         if (ret != 0 || sig->remote_sdp == NULL) {
             ESP_LOGE(TAG, "Fail to post data to %s", OPENAI_REALTIME_URL);
             return -1;
