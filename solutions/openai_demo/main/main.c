@@ -177,6 +177,9 @@ static void thread_scheduler(const char *thread_name, media_lib_thread_cfg_t *th
         thread_cfg->priority = 18;
         thread_cfg->core_id = 1;
     }
+    if (strcmp(thread_name, "start") == 0) {
+        thread_cfg->stack_size = 6 * 1024;
+    }
     if (strcmp(thread_name, "pc_send") == 0) {
         thread_cfg->stack_size = 4 * 1024;
         thread_cfg->priority = 15;

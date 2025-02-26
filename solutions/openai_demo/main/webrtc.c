@@ -519,6 +519,9 @@ int start_webrtc(void)
     esp_peer_default_cfg_t peer_cfg = {
         .agent_recv_timeout = 500,
     };
+    openai_signaling_cfg_t openai_cfg = {
+        .token = OPENAI_API_KEY,
+    };
     esp_webrtc_cfg_t cfg = {
         .peer_cfg = {
             .audio_info = {
@@ -536,7 +539,7 @@ int start_webrtc(void)
             .extra_cfg = &peer_cfg,
             .extra_size = sizeof(peer_cfg),
         },
-        .signaling_cfg.extra_cfg = OPENAI_API_KEY,
+        .signaling_cfg.extra_cfg = &openai_cfg,
         .peer_impl = esp_peer_get_default_impl(),
         .signaling_impl = esp_signaling_get_openai_signaling(),
     };
