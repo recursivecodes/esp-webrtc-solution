@@ -63,7 +63,7 @@ function common_before_scripts() {
   export PYTHONPATH="$IDF_PATH/tools:$IDF_PATH/tools/esp_app_trace:$IDF_PATH/components/partition_table:$IDF_PATH/tools/ci/python_packages:$PYTHONPATH"
 }
 
-function setup_tools_and_idf_python_venv() {
+function setup_tools_and_idf_python_venv0() {
   # must use after setup_tools_except_target_test
   # otherwise the export.sh won't work properly
   pushd ${IDF_PATH} 2>/dev/null

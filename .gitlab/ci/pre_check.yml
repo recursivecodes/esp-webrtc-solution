@@ -1,6 +1,6 @@
 .pre_check_template:
   stage: pre_check
-  image: "${CI_DOCKER_REGISTRY}/esp-env-v5.3:1"
+  image: "${CI_DOCKER_REGISTRY}/esp-env-v5.4:1"
   tags:
     - host_test
   dependencies: []
