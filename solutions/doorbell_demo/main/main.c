@@ -41,6 +41,8 @@ static char room_url[128];
     }                                   \
     media_lib_thread_create_from_scheduler(NULL, #name, run_async##name, NULL);
 
+char server_url[64] = "https://webrtc.espressif.com";
+
 static int join_room(int argc, char **argv)
 {
     int nerrors = arg_parse(argc, argv, (void **)&room_args);
@@ -55,7 +57,7 @@ static int join_room(int argc, char **argv)
         }
     }
     const char *room_id = room_args.room_id->sval[0];
-    snprintf(room_url, sizeof(room_url), "https://webrtc.espressif.cn/join/%s", room_id);
+    snprintf(room_url, sizeof(room_url), "%s/join/%s", server_url, room_id);
     ESP_LOGI(TAG, "Start to join in room %s", room_id);
     start_webrtc(room_url);
     return 0;
@@ -93,6 +95,18 @@ static int wifi_cli(int argc, char **argv)
     char *ssid = argv[1];
     char *password = argc > 2 ? argv[2] : NULL;
     return network_connect_wifi(ssid, password);
+}
+
+static int server_cli(int argc, char **argv)
+{
+    int server_sel = argc > 1 ? atoi(argv[1]) : 0;
+    if (server_sel == 0) {
+        strcpy(server_url, "https://webrtc.espressif.com");
+    } else {
+        strcpy(server_url, "https://webrtc.espressif.cn");
+    }
+    ESP_LOGI(TAG, "Select server %s", server_url);
+    return 0;
 }
 
 static int capture_to_player_cli(int argc, char **argv)
@@ -174,6 +188,11 @@ static int init_console()
             .help = "measure system loading\r\n",
             .func = measure_cli,
         },
+         {
+            .command = "server",
+            .help = "Select server\r\n",
+            .func = server_cli,
+        },
     };
     for (int i = 0; i < sizeof(cmds) / sizeof(cmds[0]); i++) {
         ESP_ERROR_CHECK(esp_console_cmd_register(&cmds[i]));
@@ -221,10 +240,10 @@ static int network_event_handler(bool connected)
         // Enter into Room directly
         RUN_ASYNC(start, {
             char *room = gen_room_id_use_mac();
-            snprintf(room_url, sizeof(room_url), "https://webrtc.espressif.cn/join/%s", room);
+            snprintf(room_url, sizeof(room_url), "%s/join/%s", server_url, room);
             ESP_LOGI(TAG, "Start to join in room %s", room);
             if (start_webrtc(room_url) == 0) {
-                ESP_LOGW(TAG, "Please use browser to join in %s on https://webrtc.espressif.cn/doorbell", room);
+                ESP_LOGW(TAG, "Please use browser to join in %s on %s/webrtc.espressif.cn/doorbell", server_url, room);
             }
         });
     } else {
