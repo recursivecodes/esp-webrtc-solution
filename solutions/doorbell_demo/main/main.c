@@ -243,7 +243,7 @@ static int network_event_handler(bool connected)
             snprintf(room_url, sizeof(room_url), "%s/join/%s", server_url, room);
             ESP_LOGI(TAG, "Start to join in room %s", room);
             if (start_webrtc(room_url) == 0) {
-                ESP_LOGW(TAG, "Please use browser to join in %s on %s/webrtc.espressif.cn/doorbell", server_url, room);
+                ESP_LOGW(TAG, "Please use browser to join in %s on %s/doorbell", room, server_url);
             }
         });
     } else {

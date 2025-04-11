@@ -36,7 +36,7 @@ wifi ssid psw
 
 Once connected to Wi-Fi, the board will automatically try to join a room generated from its MAC address. The room name will appear in the console:
 ```
-W (9801) Webrtc_Test: Please use browser to join in espxxxxxx on https://webrtc.espressif.cn/doorbell
+W (9801) Webrtc_Test: Please use browser to join in espxxxxxx on https://webrtc.espressif.com/doorbell
 ```
 User also can use `leave` command leave the room and use the `join` command to join other random room. Make sure the room is empty before entering:
 ```
@@ -47,7 +47,7 @@ If you're the first to join, you’ll see:
 Initials set to 1
 ```
 
-Then, use a Chrome/Edge browser to enter the same room at [DoorBellDemo](https://webrtc.espressif.cn/doorbell).
+Then, use a Chrome/Edge browser to enter the same room at [DoorBellDemo](https://webrtc.espressif.com/doorbell).
 
 ### Interactions
 
@@ -76,4 +76,10 @@ All other steps follow the typical call flow of `esp_webrtc`. For more details o
 ### QA
 - If the board unexpectedly leaves the room, fail to re-enter same room.
   Server will keep the room for 1-2 minutes before timing out. The user must wait for the timeout to expire before retrying.
+  Or `leave` room firstly then `join` a random room id.
+
+- If user want to change cn server can use following command before enter `join`
+   ```
+   server 1
+   ```
 
