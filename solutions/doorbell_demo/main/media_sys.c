@@ -183,9 +183,10 @@ static int build_player_system()
         .lcd_handle = board_get_lcd_handle(),
     };
     player_sys.video_render = av_render_alloc_lcd_render(&lcd_cfg);
+
     if (player_sys.video_render == NULL) {
         ESP_LOGE(TAG, "Fail to create video render");
-        return -1;
+        // Allow not display
     }
     av_render_cfg_t render_cfg = {
         .audio_render = player_sys.audio_render,

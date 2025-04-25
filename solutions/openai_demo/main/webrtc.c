@@ -540,6 +540,7 @@ int start_webrtc(void)
             .extra_size = sizeof(peer_cfg),
         },
         .signaling_cfg.extra_cfg = &openai_cfg,
+        .signaling_cfg.extra_size = sizeof(openai_cfg),
         .peer_impl = esp_peer_get_default_impl(),
         .signaling_impl = esp_signaling_get_openai_signaling(),
     };

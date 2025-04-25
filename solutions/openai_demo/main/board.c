@@ -21,5 +21,4 @@ void init_board(void)
         .reuse_dev = false
     };
     init_codec(&cfg);
-    board_lcd_init();
 }
