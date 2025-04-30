@@ -7,7 +7,8 @@ my %target = (
     "doorbell_demo"  => [qw/esp32p4 esp32s3/],
     "openai_demo"    => [qw/esp32s3/],
     "videocall_demo" => [qw/esp32p4/],
-    "whip_demo"      => [qw/esp32p4/]
+    "whip_demo"      => [qw/esp32p4/],
+    "doorbell_local" => [qw/esp32p4/]
 );
 
 my $cur = cwd();
