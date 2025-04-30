@@ -7,7 +7,7 @@ It includes the `esp_webrtc` core code along with its dependent components, such
 - **`esp_capture`**: For capturing media data  
 - **`av_render`**: For playing media data  
 
-Additionally, the repository contains three simple demo applications that demonstrate how to use `esp_webrtc`.
+Additionally, the repository contains three several demo applications that demonstrate how to use `esp_webrtc`.
 
 ## Solutions
 
@@ -28,3 +28,7 @@ This demo show how to use `esp_webrtc` data channel to build up video call appli
 
 ### 5. WHIP Publisher Solution
 This demo show how to use `esp_webrtc` to publish streaming data to WHIP server.
+
+### 6. Doorbell Local Demo
+This demo sets up a local doorbell application that operates without external signaling servers.  
+An ESP32 series board acts as the signaling server, allowing users to connect directly for WebRTC testing.
