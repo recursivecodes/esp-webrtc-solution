@@ -129,7 +129,6 @@ static esp_capture_video_src_if_t *create_video_source(void)
         dvp_config.pclk_pin = cam_pin_cfg.pclk;
         dvp_config.xclk_pin = cam_pin_cfg.xclk;
         dvp_config.xclk_freq = 20000000;
-        dvp_config.i2c_master = get_i2c_bus_handle(0);
         return esp_capture_new_video_dvp_src(&dvp_config);
     }
 #endif
