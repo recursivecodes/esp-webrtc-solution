@@ -16,14 +16,24 @@ extern "C" {
 /**
  * @brief  Board name setting refer to `codec_board` README.md for more details
  */
+#if CONFIG_IDF_TARGET_ESP32P4
 #define TEST_BOARD_NAME "ESP32_P4_DEV_V14"
+#else
+#define TEST_BOARD_NAME "S3_Korvo_V2"
+#endif
 
 /**
  * @brief  Video resolution settings
  */
-#define VIDEO_WIDTH  1024
-#define VIDEO_HEIGHT 600
+#if CONFIG_IDF_TARGET_ESP32P4
+#define VIDEO_WIDTH  1920
+#define VIDEO_HEIGHT 1080
+#define VIDEO_FPS    25
+#else
+#define VIDEO_WIDTH  320
+#define VIDEO_HEIGHT 240
 #define VIDEO_FPS    10
+#endif
 
 /**
  * @brief  Set for wifi ssid
