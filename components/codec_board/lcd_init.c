@@ -1,4 +1,3 @@
-#include "media_lib_os.h"
 #include "codec_board.h"
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_panel_ops.h"
@@ -23,6 +22,8 @@
 #include "soc/mipi_dsi_bridge_struct.h"
 #include "esp_lcd_ek79007.h"
 #endif
+
+#include "freertos/FreeRTOS.h"
 
 #define TAG "LCD_INIT"
 
@@ -116,11 +117,16 @@ static int16_t get_hw_gpio(int16_t pin)
     return pin;
 }
 
+static void sleep_ms(int ms)
+{
+    vTaskDelay(ms / portTICK_PERIOD_MS);
+}
+
 static int _lcd_rest(lcd_cfg_t *cfg)
 {
     if (cfg->reset_pin >= 0) {
         set_pin_state(cfg->reset_pin, false);
-        media_lib_thread_sleep(100);
+        sleep_ms(100);
         set_pin_state(cfg->reset_pin, true);
     }
     return 0;
@@ -131,9 +137,9 @@ static int _init_spi_lcd(lcd_cfg_t *cfg)
     int ret = 0;
     if (cfg->spi_cfg.cs & BOARD_EXTEND_IO_START) {
         set_pin_dir(cfg->spi_cfg.cs, true);
-        media_lib_thread_sleep(10);
+        sleep_ms(10);
         set_pin_dir(cfg->spi_cfg.cs, false);
-        media_lib_thread_sleep(10);
+        sleep_ms(10);
     }
     spi_bus_config_t buscfg = {
         .sclk_io_num = cfg->spi_cfg.clk,

@@ -175,11 +175,14 @@ int simple_capture_add_path(esp_capture_path_if_t *p, esp_capture_path_type_t pa
     }
     simple_capture_res_t *res = &capture->primary;
     if (res->added) {
-        return ESP_CAPTURE_ERR_INVALID_STATE;
-    }
-    media_lib_event_group_create(&res->event_group);
-    if (res->event_group == NULL) {
-        return ESP_CAPTURE_ERR_NO_MEM;
+        if (res->started) {
+            return ESP_CAPTURE_ERR_INVALID_STATE;
+        }
+    } else {
+        media_lib_event_group_create(&res->event_group);
+        if (res->event_group == NULL) {
+            return ESP_CAPTURE_ERR_NO_MEM;
+        }
     }
     res->sink = *sink;
     if (sink->audio_info.codec && check_audio_codec_support(capture, capture->enc_cfg.aenc, &sink->audio_info) == false) {
@@ -307,7 +310,10 @@ static void simple_capture_venc_thread(void *arg)
         }
         // TODO use original frame is OK?
         if (res->venc_bypass) {
-            capture->src_cfg.frame_processed(capture->src_cfg.src_ctx, ESP_CAPTURE_PATH_PRIMARY, &frame);
+            ret = capture->src_cfg.frame_processed(capture->src_cfg.src_ctx, ESP_CAPTURE_PATH_PRIMARY, &frame);
+            if (ret != ESP_CAPTURE_ERR_OK) {
+                capture->src_cfg.release_src_frame(capture->src_cfg.src_ctx, &frame);
+            }
             if (frame.data == NULL && frame.size == 0) {
                 ESP_LOGI(TAG, "Stop frame is received");
                 break;

@@ -5,6 +5,7 @@
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "driver/i2s_std.h"
 #include "driver/i2s_tdm.h"
+#include "driver/i2s_pdm.h"
 #include "soc/soc_caps.h"
 #else
 #include "driver/i2s.h"
@@ -102,7 +103,12 @@ static int _i2c_init(uint8_t port)
 
 void *get_i2c_bus_handle(uint8_t port)
 {
-    ESP_LOGI(TAG, "Get mater handle %d %p", port, i2c_bus_handle[port]);
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 4, 0)
+    // Try to get port from I2C driver directly
+    i2c_master_bus_handle_t bus_handle = NULL;
+    i2c_master_get_bus_handle(port, &bus_handle);
+    return bus_handle;
+#endif
     return i2c_bus_handle[port];
 }
 
@@ -182,6 +188,7 @@ static int _i2s_init(uint8_t port, esp_codec_dev_type_t dev_type, codec_init_cfg
     };
     tdm_cfg.slot_cfg.total_slot = 4;
 #endif
+    chan_cfg.id = I2S_NUM_AUTO; // Use auto ID
     int ret = i2s_new_channel(&chan_cfg, output == false ? NULL : &i2s_keep[port]->tx_handle,
                               input == false ? NULL : &i2s_keep[port]->rx_handle);
     ESP_LOGI(TAG, "tx:%p rx:%p", i2s_keep[port]->tx_handle, i2s_keep[port]->rx_handle);
@@ -196,6 +203,23 @@ static int _i2s_init(uint8_t port, esp_codec_dev_type_t dev_type, codec_init_cfg
             ESP_LOGI(TAG, "output init tdm ret %d", ret);
         }
 #endif
+#ifdef SOC_I2S_SUPPORTS_PDM_TX
+        else if (init_cfg->out_mode == CODEC_I2S_MODE_PDM) {
+            i2s_pdm_tx_config_t pdm_cfg = {
+                .clk_cfg = I2S_PDM_TX_CLK_DEFAULT_CONFIG(16000),
+                .slot_cfg = I2S_PDM_TX_SLOT_DEFAULT_CONFIG(16, I2S_SLOT_MODE_STEREO),
+                .gpio_cfg = {
+                    .dout = i2s_cfg.dout,
+                    .clk = i2s_cfg.bclk,
+                    .invert_flags = {
+                        .clk_inv = false,
+                    },
+                },
+            };
+            ret = i2s_channel_init_pdm_tx_mode(i2s_keep[port]->tx_handle, &pdm_cfg);
+            ESP_LOGI(TAG, "output init pdm ret %d", ret);
+        }
+#endif
     }
     if (i2s_keep[port]->rx_handle) {
         if (init_cfg->in_mode == CODEC_I2S_MODE_STD) {
@@ -206,6 +230,23 @@ static int _i2s_init(uint8_t port, esp_codec_dev_type_t dev_type, codec_init_cfg
         else if (init_cfg->in_mode == CODEC_I2S_MODE_TDM) {
             ret = i2s_channel_init_tdm_mode(i2s_keep[port]->rx_handle, &tdm_cfg);
             ESP_LOGI(TAG, "Input init tdm ret %d", ret);
+        }
+#endif
+#ifdef SOC_I2S_SUPPORTS_PDM_RX
+        else if (init_cfg->in_mode == CODEC_I2S_MODE_PDM) {
+            i2s_pdm_rx_config_t pdm_cfg = {
+                .clk_cfg = I2S_PDM_RX_CLK_DEFAULT_CONFIG(16000),
+                .slot_cfg = I2S_PDM_RX_SLOT_DEFAULT_CONFIG(16, I2S_SLOT_MODE_STEREO),
+                .gpio_cfg = {
+                    .din = i2s_cfg.din,
+                    .clk = i2s_cfg.bclk,
+                    .invert_flags = {
+                        .clk_inv = false,
+                    },
+                },
+            };
+            ret = i2s_channel_init_pdm_rx_mode(i2s_keep[port]->rx_handle, &pdm_cfg);
+            ESP_LOGI(TAG, "Input init pdm ret %d", ret);
         }
 #endif
     }
@@ -275,6 +316,28 @@ static int _i2s_deinit(uint8_t port)
     return 0;
 }
 
+int init_i2c(uint8_t port)
+{
+    return _i2c_init(port);
+}
+
+int deinit_i2c(uint8_t port)
+{
+    return _i2c_deinit(port);
+}
+
+static int check_i2c_inited(int8_t port)
+{
+    if (port < 0) {
+        return 0;
+    }
+    // Already installed
+    if (get_i2c_bus_handle(port)) {
+        return 0;
+    }
+    return _i2c_init(port);
+}
+
 int init_codec(codec_init_cfg_t *cfg)
 {
     if (cfg == NULL) {
@@ -299,13 +362,13 @@ int init_codec(codec_init_cfg_t *cfg)
         ESP_LOGE(TAG, "No codec device found");
         return -1;
     }
-    // Force to init I2C firstly
-    _i2c_init(0);
+    // Try to get I2C handle
+    check_i2c_inited(0);
     // Init i2c and i2s
     bool same_i2s = (has_in && has_out && out_cfg.i2s_port == in_cfg.i2s_port);
     ESP_LOGI(TAG, "in:%d out:%d port: %d", has_in, has_out, out_cfg.i2s_port == in_cfg.i2s_port);
     if (has_out) {
-        if (out_cfg.i2c_port >= 0 && _i2c_init(out_cfg.i2c_port)) {
+        if (check_i2c_inited(out_cfg.i2c_port) < 0) {
             ESP_LOGE(TAG, "Fail to int i2c: %d", out_cfg.i2c_port);
             return -1;
         }
@@ -317,7 +380,7 @@ int init_codec(codec_init_cfg_t *cfg)
         ESP_LOGI(TAG, "Success to init i2s: %d", in_cfg.i2s_port);
     }
     if (has_in) {
-        if (in_cfg.i2c_port >= 0 && _i2c_init(in_cfg.i2c_port)) {
+        if (check_i2c_inited(in_cfg.i2c_port) < 0) {
             ESP_LOGE(TAG, "Fail to int i2c: %d", in_cfg.i2c_port);
             return -1;
         }
@@ -346,7 +409,7 @@ int init_codec(codec_init_cfg_t *cfg)
         audio_codec_i2c_cfg_t i2c_cfg = {
             .port = out_cfg.i2c_port,
 #ifdef USE_I2C_MASTER
-            .bus_handle = i2c_bus_handle[out_cfg.i2c_port],
+            .bus_handle = get_i2c_bus_handle(out_cfg.i2c_port),
 #endif
         };
         // TODO add other codec support
@@ -420,7 +483,7 @@ int init_codec(codec_init_cfg_t *cfg)
         audio_codec_i2c_cfg_t i2c_cfg = {
             .port = in_cfg.i2c_port,
 #ifdef USE_I2C_MASTER
-            .bus_handle = i2c_bus_handle[in_cfg.i2c_port],
+            .bus_handle = get_i2c_bus_handle(in_cfg.i2c_port),
 #endif
         };
         // TODO add other codec support
@@ -464,12 +527,18 @@ int init_codec(codec_init_cfg_t *cfg)
         };
         codec_res.record_dev = esp_codec_dev_new(&dev_cfg);
     }
-    int ret = esp_codec_dev_set_out_vol(codec_res.play_dev, 60.0);
-    ret = esp_codec_dev_set_in_gain(codec_res.record_dev, 30.0);
-    if (ret == 0) {
-        codec_res.inited = true;
+    // Set default volume and gain for play and record
+    if (codec_res.play_dev) {
+        esp_codec_dev_set_out_vol(codec_res.play_dev, 60.0);
     }
-    return ret;
+    if (codec_res.record_dev) {
+        esp_codec_dev_set_in_gain(codec_res.record_dev, 30.0);
+    }
+    if ((codec_res.play_dev != NULL) || (codec_res.record_dev != NULL)) {
+        codec_res.inited = true;
+        return 0;
+    }
+    return -1;
 }
 
 esp_codec_dev_handle_t get_playback_handle(void)
@@ -554,6 +623,17 @@ static void enable_mmc_phy_power(void)
 #endif
 }
 
+#if CONFIG_IDF_TARGET_ESP32P4
+static void sdmmc_get_slot(const int slot, sdmmc_slot_config_t *config)
+{
+    memset(config, 0, sizeof(sdmmc_slot_config_t));
+    config->cd = SDMMC_SLOT_NO_CD;
+    config->wp = SDMMC_SLOT_NO_WP;
+    config->width = 4;
+    config->flags = 0;
+}
+#endif
+
 int mount_sdcard(void)
 {
     sdcard_cfg_t cfg = { 0 };
@@ -562,6 +642,19 @@ int mount_sdcard(void)
     if (ret != 0) {
         return ret;
     }
+
+#if defined CONFIG_IDF_TARGET_ESP32
+    gpio_config_t sdcard_pwr_pin_cfg = {
+        .pin_bit_mask = 1UL << GPIO_NUM_13,
+        .mode = GPIO_MODE_OUTPUT,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE,
+    };
+    gpio_config(&sdcard_pwr_pin_cfg);
+    gpio_set_level(GPIO_NUM_13, 0);
+#endif
+
 #if SOC_SDMMC_HOST_SUPPORTED
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {
         .format_if_mount_failed = false,
@@ -569,9 +662,12 @@ int mount_sdcard(void)
     };
     sdmmc_host_t host = SDMMC_HOST_DEFAULT();
 #if CONFIG_IDF_TARGET_ESP32P4
+    host.slot = 0;
     host.max_freq_khz = SDMMC_FREQ_HIGHSPEED;
 #endif
     sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
+    slot_config.width = cfg.d3 ? 4 : 1;
+#if SOC_SDMMC_USE_GPIO_MATRIX
     slot_config.width = cfg.d3 ? 4 : 1;
     slot_config.flags |= SDMMC_SLOT_FLAG_INTERNAL_PULLUP;
     slot_config.d4 = -1;
@@ -586,6 +682,11 @@ int mount_sdcard(void)
     slot_config.d1 = cfg.d1 ? cfg.d1 : -1;
     slot_config.d2 = cfg.d2 ? cfg.d2 : -1;
     slot_config.d3 = cfg.d3 ? cfg.d3 : -1;
+#endif /* SOC_SDMMC_USE_GPIO_MATRIX */
+#if CONFIG_IDF_TARGET_ESP32P4
+    sdmmc_get_slot(0, &slot_config);
+#endif
+
     printf("use %d %d %d %d\n", cfg.d0, cfg.d1, cfg.d2, cfg.d3);
     return esp_vfs_fat_sdmmc_mount("/sdcard", &host, &slot_config, &mount_config, &card);
 #else
@@ -593,7 +694,12 @@ int mount_sdcard(void)
 #endif
 }
 
-void unmount_sdcard()
+void *get_sdcard_handle(void)
+{
+    return card;
+}
+
+void unmount_sdcard(void)
 {
     if (card) {
         esp_vfs_fat_sdcard_unmount("/sdcard", card);

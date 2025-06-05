@@ -36,6 +36,7 @@ extern "C" {
 typedef enum {
     CODEC_I2S_MODE_STD = 0, /*!< STD mode */
     CODEC_I2S_MODE_TDM,     /*!< TDM mode */
+    CODEC_I2S_MODE_PDM,     /*!< PDM mode */
     CODEC_I2S_MODE_NONE,    /*!< NONE means not support */
 } codec_i2s_mode_t;
 
@@ -43,11 +44,38 @@ typedef enum {
  * @brief  Codec initialize configuration
  */
 typedef struct {
-    codec_i2s_mode_t in_mode;    /*!< I2S input mode */
-    codec_i2s_mode_t out_mode;   /*!< I2S output mode */
-    bool             in_use_tdm; /*!< Whether codec use TDM mode for input (codec use TDM, I2S can use STD mode) */
-    bool             reuse_dev;  /*!< Use same handle for both input and output */
+    codec_i2s_mode_t in_mode;         /*!< I2S input mode */
+    codec_i2s_mode_t out_mode;        /*!< I2S output mode */
+    bool             in_use_tdm;      /*!< Whether codec use TDM mode for input (codec use TDM, I2S can use STD mode) */
+    bool             reuse_dev;       /*!< Use same handle for both input and output */
 } codec_init_cfg_t;
+
+/**
+ * @brief  Initialize I2C driver
+ *
+ * @note  When user want to get I2C bus handle either use `get_i2c_bus_handle`
+ *        Or use IDF API `i2c_master_get_bus_handle` on IDFv5.4 or high
+ *
+ * @param[in]  port  I2C port
+ *
+ * @return
+ *       - 0       On success
+ *       - Others  Fail to initialize
+ */
+int init_i2c(uint8_t port);
+
+/**
+ * @brief  Deinitialize I2C driver
+ *
+ * @note  Attention make sure no driver use I2C bus anymore before do this action
+ *
+ * @param[in]  port  I2C port
+ *
+ * @return
+ *       - 0       On success
+ *       - Others  Fail to initialize
+ */
+int deinit_i2c(uint8_t port);
 
 /**
  * @brief  Initialize codec
@@ -90,7 +118,7 @@ esp_codec_dev_handle_t get_record_handle(void);
 void *get_i2c_bus_handle(uint8_t port);
 
 /**
- * @brief  Mount sdcard
+ * @brief  Mount SDCard
  *
  * @return
  *       - 0       On success
@@ -99,7 +127,16 @@ void *get_i2c_bus_handle(uint8_t port);
 int mount_sdcard(void);
 
 /**
- * @brief  Unmount sdcard
+ * @brief  Get mounted SDCard handle
+ *
+ * @return
+ *       - 0       On success
+ *       - Others  Fail to mount
+ */
+void *get_sdcard_handle(void);
+
+/**
+ * @brief  Unmount SDCard
  */
 void unmount_sdcard(void);
 

@@ -34,7 +34,7 @@ i2c: {sda: 18, scl: 23}
 i2s: {mclk: 0, bclk: 5, ws: 25, dout: 26, din: 35}
 i2s: {mclk: -1, bclk: 32, ws: 33, din: 36}
 out: {codec: ES8311, pa: 21, use_mclk: 1, pa_gain:20}
-in: {codec: ES7243, i2s_port: 0}
+in: {codec: ES7243, i2s_port: 1}
 sdcard: {power: 13, clk: 14, cmd: 15, d0: 2}
 
 Board: ESP32_KORVO_V1
@@ -84,3 +84,13 @@ i2s: {mclk: -1, bclk: 41, ws: 42, dout: -1, din: 2}
 in: {codec: DUMMY, i2c_port: -1}
 sdcard: {clk: 39, cmd: 38, d0: 40}
 camera: {type: dvp, xclk: 15, pclk: 13, vsync: 6, href: 7, d0: 11, d1: 9, d2: 8, d3: 10, d4: 12, d5: 18, d6: 17, d7: 16}
+
+Board: XD_AIOT_C3
+i2c: {sda: 0, scl: 1}
+i2s: {mclk: 10, bclk: 8, ws: 12, dout: 11, din: 7}
+in_out: {codec: ES8311, pa: 13, pa_gain:6}
+
+Board: ESP_SPOT
+i2c: {sda: 25, scl: 26, i2c_addr: 0x18}
+i2s: {bclk: 7, ws: 8, dout: 9, din: 10}
+in_out: {codec: ES8311, pa: 23, pa_gain:6}
