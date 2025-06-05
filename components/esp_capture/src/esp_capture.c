@@ -629,6 +629,16 @@ static int audio_sink_release_frame(void *item, void *ctx)
 static int stop_muxer(capture_path_t *path)
 {
     // Disable data sending firstly
+    if (path->muxer_q) {
+        esp_capture_stream_frame_t frame = {0};
+        while (msg_q_recv(path->muxer_q, &frame, sizeof(frame), true) == 0) {
+            if (frame.stream_type == ESP_CAPTURE_STREAM_TYPE_AUDIO) {
+                share_q_release(path->audio_share_q, &frame);
+            } else if (frame.stream_type == ESP_CAPTURE_STREAM_TYPE_VIDEO) {
+                share_q_release(path->video_share_q, &frame);
+            }
+        }
+    }
     if (path->video_share_q) {
         share_q_enable(path->video_share_q, CAPTURE_SHARED_BY_MUXER, false);
     }
@@ -840,6 +850,7 @@ static int start_path(capture_path_t *path)
     }
     if (path->muxer_q) {
         // Create muxer output queue if user want to fetch muxer data also
+        bool muxer_res_ready = true;
         if (path->muxer_cfg.capture_muxer_data) {
             int muxer_pool_size = MUXER_DEFAULT_POOL_SIZE;
             if (path->muxer_cfg.muxer_cache_size) {
@@ -849,10 +860,11 @@ static int start_path(capture_path_t *path)
                 path->muxer_data_q = data_queue_init(muxer_pool_size);
                 if (path->muxer_data_q == NULL) {
                     ESP_LOGE(TAG, "Fail to create output queue for muxer");
+                    muxer_res_ready = false;
                 }
             }
         }
-        if (path->muxer_data_q) {
+        if (muxer_res_ready) {
             start_muxer(path);
         }
     }
@@ -1172,7 +1184,22 @@ int esp_capture_setup_path(esp_capture_handle_t h, esp_capture_path_type_t type,
                 ESP_LOGW(TAG, "Not allowed to change sink during running");
                 BREAK_SET_RETURN(ESP_CAPTURE_ERR_INVALID_STATE);
             }
+            cur->enable = false;
+            cur->muxer_enable = false;
+            cur->sink_disabled = false;
+            capture->audio_nego_done = false;
+            capture->video_nego_done = false;
             cur->sink_cfg = *sink_info;
+            release_path(cur);
+            memset(&cur->muxer_cfg, 0, sizeof(cur->muxer_cfg));
+            if (capture->cfg.capture_path == NULL) {
+                ret = capture_negotiate_directly(capture, sink_info);
+            } else {
+                ret = capture->cfg.capture_path->add_path(capture->cfg.capture_path, cur->path_type, sink_info);
+            }
+            if (ret != ESP_CAPTURE_ERR_OK) {
+                BREAK_SET_RETURN(ret);
+            }
             *path = (esp_capture_path_handle_t)cur;
             BREAK_SET_RETURN(ESP_CAPTURE_ERR_OK);
         }
@@ -1323,10 +1350,10 @@ int esp_capture_enable_path(esp_capture_path_handle_t h, esp_capture_run_type_t 
     if (enable == false) {
         ret = stop_path(path);
         if (has_active_path(capture, ESP_CAPTURE_STREAM_TYPE_VIDEO, false) == false) {
-            capture->audio_nego_done = false;
+            capture->video_nego_done = false;
         }
         if (has_active_path(capture, ESP_CAPTURE_STREAM_TYPE_AUDIO, false) == false) {
-            capture->video_nego_done = false;
+            capture->audio_nego_done = false;
         }
     } else {
         if (capture->started) {

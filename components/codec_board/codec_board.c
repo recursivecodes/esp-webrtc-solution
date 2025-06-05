@@ -13,6 +13,9 @@ static board_section_t *codec;
 
 void set_codec_board_type(const char *codec_type)
 {
+    if (codec) {
+        return;
+    }
     codec = get_codec_section(codec_type);
 }
 
