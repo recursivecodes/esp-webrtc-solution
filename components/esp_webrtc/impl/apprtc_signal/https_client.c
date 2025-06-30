@@ -48,6 +48,8 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt)
 {
     http_info_t *info = evt->user_data;
     switch (evt->event_id) {
+        default:
+            break;
         case HTTP_EVENT_ERROR:
             ESP_LOGD(TAG, "HTTP_EVENT_ERROR");
             break;

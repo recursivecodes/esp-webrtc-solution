@@ -663,6 +663,8 @@ int mount_sdcard(void)
     sdmmc_host_t host = SDMMC_HOST_DEFAULT();
 #if CONFIG_IDF_TARGET_ESP32P4
     host.slot = 0;
+#endif
+#if CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32P4
     host.max_freq_khz = SDMMC_FREQ_HIGHSPEED;
 #endif
     sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
