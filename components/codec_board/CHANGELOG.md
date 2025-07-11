@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.5.5
+
+- Add board support for `ESP32_S3_KORVO_2L`, `ESP32_S3_EchoEar`, `ATOMS3_ECHO_BASE`
+- Mount SDcard use high speed for better performance on esp32s3 and esp32p4
+
 ## v0.5.4
 
 - Add PDM support
