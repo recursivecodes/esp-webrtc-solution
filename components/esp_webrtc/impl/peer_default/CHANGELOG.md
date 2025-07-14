@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.2.0
+
+### Features
+
+- Added reliable and un-ordered data channel support
+- Added FORWARD-TSN support for un-ordered data channel
+
+### Bug Fixes
+
+- Fixed keep alive check not take effect if agent only have local candidates
+- Fixed agent mode not set if remote candidate already get
+
 ## v1.1.0
 
 ### Features
@@ -10,7 +22,7 @@
 
 ### Bug Fixes
 
-- Fixed keep alive check not take effect if peer closed unexpectly
+- Fixed keep alive check not take effect if peer closed unexpectedly
 
 
 ## v1.0.0

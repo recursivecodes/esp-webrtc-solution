@@ -55,7 +55,7 @@ static int join_room(int argc, char **argv)
         }
     }
     const char *room_id = room_args.room_id->sval[0];
-    snprintf(room_url, sizeof(room_url), "https://webrtc.espressif.cn/join/%s", room_id);
+    snprintf(room_url, sizeof(room_url), "https://webrtc.espressif.com/join/%s", room_id);
     ESP_LOGI(TAG, "Start to join in room %s", room_id);
     start_webrtc(room_url);
     return 0;

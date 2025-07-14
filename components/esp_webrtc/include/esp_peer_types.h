@@ -44,6 +44,7 @@ typedef enum {
     ESP_PEER_ERR_FAIL         = -6, /*!< General error code */
     ESP_PEER_ERR_OVER_LIMITED = -7, /*!< Overlimited */
     ESP_PEER_ERR_BAD_DATA     = -8, /*!< Bad input data */
+    ESP_PEER_ERR_WOULD_BLOCK  = -9, /*!< Not enough buffer for output packet, need sleep and retry later */
 } esp_peer_err_t;
 
 /**
