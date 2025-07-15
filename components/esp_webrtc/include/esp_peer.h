@@ -36,7 +36,7 @@ extern "C" {
 typedef enum {
     ESP_PEER_STATE_CLOSED                    = 0,  /*!< Closed */
     ESP_PEER_STATE_DISCONNECTED              = 1,  /*!< Disconnected */
-    ESP_PEER_STATE_NEW_CONNECTION            = 2,  /*!< New connection comming */
+    ESP_PEER_STATE_NEW_CONNECTION            = 2,  /*!< New connection coming */
     ESP_PEER_STATE_PAIRING                   = 3,  /*!< Under candidate pairing */
     ESP_PEER_STATE_PAIRED                    = 4,  /*!< Candidate pairing success */
     ESP_PEER_STATE_CONNECTING                = 5,  /*!< Building connection with peer */
@@ -45,7 +45,7 @@ typedef enum {
     ESP_PEER_STATE_DATA_CHANNEL_CONNECTED    = 8,  /*!< Data channel is connected */
     ESP_PEER_STATE_DATA_CHANNEL_OPENED       = 9,  /*!< Data channel is opened */
     ESP_PEER_STATE_DATA_CHANNEL_CLOSED       = 10, /*!< Data channel is closed */
-    ESP_PEER_STATE_DATA_CHANNEL_DISCONNECTED = 11, /*!< Data channel is disconencted */
+    ESP_PEER_STATE_DATA_CHANNEL_DISCONNECTED = 11, /*!< Data channel is disconnected */
 } esp_peer_state_t;
 
 /**
@@ -161,10 +161,25 @@ typedef struct {
 } esp_peer_msg_t;
 
 /**
- * @brief  Peer data channel configuration for create
+ * @brief  Reliable type for peer data channel
+ */
+typedef enum {
+    ESP_PEER_DATA_CHANNEL_RELIABLE,                  /*!< Reliable data channel with guaranteed delivery */
+    ESP_PEER_DATA_CHANNEL_PARTIAL_RELIABLE_TIMEOUT,  /*!< Unreliable by lifetime (maxPacketLifeTime) */
+    ESP_PEER_DATA_CHANNEL_PARTIAL_RELIABLE_RETX,     /*!< Unreliable by max retransmits (maxRetransmits) */
+} esp_peer_data_channel_reliable_type_t;
+
+/**
+ * @brief  Configuration for peer data channel
  */
 typedef struct {
-    char *label; /*!< Data channel label */
+    esp_peer_data_channel_reliable_type_t type;    /*!< Reliability type */
+    bool                                  ordered; /*!< true = ordered delivery, false = unordered */
+    char                                 *label;   /*!< Data channel label */
+    union {
+        uint16_t max_retransmit_count; /*!< Only valid if type is ESP_PEER_DATA_CHANNEL_PARTIAL_RELIABLE_RETX */
+        uint16_t max_packet_lifetime;  /*!< Only valid if type is ESP_PEER_DATA_CHANNEL_PARTIAL_RELIABLE_TIMEOUT (in milliseconds) */
+    };
 } esp_peer_data_channel_cfg_t;
 
 /**
@@ -196,6 +211,7 @@ typedef struct {
     bool                         enable_data_channel; /*!< Enable data channel */
     bool                         manual_ch_create;    /*!< Manual create data channel
                                                            When SCTP role is client, it will try to send DCEP automatically
+                                                           The default configuration are ordered, partial reliable timeout when use peer_default
                                                            To disable this behavior can create data channel manually and set this flag
                                                           */
     void                        *extra_cfg;           /*!< Extra configuration */
@@ -257,7 +273,7 @@ typedef struct {
      * @return          Status code indicating success or failure.
      */
     int (*on_channel_open)(esp_peer_data_channel_info_t *ch, void *ctx);
-   
+
     /**
      * @brief  Peer data frame callback
      * @param[in]  frame  Data frame information
@@ -414,7 +430,7 @@ int esp_peer_new_connection(esp_peer_handle_t peer);
  * @brief  Manually create data channel
  *
  * @note  It will send DCEP event to peer until data channel created
- *        
+ *
  * @param[in]  peer    Peer handle
  * @param[in]  ch_cfg  Configuration for data channel creation
  *
@@ -505,6 +521,7 @@ int esp_peer_send_audio(esp_peer_handle_t peer, esp_peer_audio_frame_t *info);
  *       - ESP_PEER_ERR_NONE         Open peer connection success
  *       - ESP_PEER_ERR_INVALID_ARG  Invalid argument
  *       - ESP_PEER_ERR_NOT_SUPPORT  Not support
+ *       - ESP_PEER_ERR_WOULD_BLOCK  Data channel buffer is full, need sleep some time and retry later
  */
 int esp_peer_send_data(esp_peer_handle_t peer, esp_peer_data_frame_t *frame);
 
