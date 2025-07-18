@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.2.1
+
+### Features
+
+- Make `esp_peer` as separate module for ESP Component Registry
+- Allow RTP rolling buffer allocated on RAM
+
+### Bug Fixes
+
+- Fixed handshake may error if agent receive handshake message during connectivity check
+
 ## v1.2.0
 
 ### Features

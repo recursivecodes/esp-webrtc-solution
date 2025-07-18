@@ -1,25 +1,8 @@
-/**
- * ESPRESSIF MIT License
+/*
+ * SPDX-FileCopyrightText: 2025 Espressif Systems (Shanghai) CO., LTD
+ * SPDX-License-Identifier: LicenseRef-Espressif-Modified-MIT
  *
- * Copyright (c) 2025 <ESPRESSIF SYSTEMS (SHANGHAI) CO., LTD>
- *
- * Permission is hereby granted for use on all ESPRESSIF SYSTEMS products, in which case,
- * it is free of charge, to any person obtaining a copy of this software and associated
- * documentation files (the "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the Software is furnished
- * to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
+ * See LICENSE file for details.
  */
 
 #pragma once
@@ -83,8 +66,7 @@ typedef enum {
     ESP_PEER_MEDIA_DIR_NONE      = 0,
     ESP_PEER_MEDIA_DIR_SEND_ONLY = (1 << 0), /*!< Send only */
     ESP_PEER_MEDIA_DIR_RECV_ONLY = (1 << 1), /*!< Receive only */
-    ESP_PEER_MEDIA_DIR_SEND_RECV = ESP_PEER_MEDIA_DIR_SEND_ONLY | ESP_PEER_MEDIA_DIR_RECV_ONLY,
-    /*!< Send and receive both */
+    ESP_PEER_MEDIA_DIR_SEND_RECV = ESP_PEER_MEDIA_DIR_SEND_ONLY | ESP_PEER_MEDIA_DIR_RECV_ONLY, /*!< Send and receive both */
 } esp_peer_media_dir_t;
 
 /**
@@ -99,47 +81,47 @@ typedef enum {
  * @brief  Video stream information
  */
 typedef struct {
-    esp_peer_video_codec_t codec;  /*!< Video codec */
-    int                    width;  /*!< Video width */
-    int                    height; /*!< Video height */
-    int                    fps;    /*!< Video fps */
+    esp_peer_video_codec_t  codec;  /*!< Video codec */
+    int                     width;  /*!< Video width */
+    int                     height; /*!< Video height */
+    int                     fps;    /*!< Video fps */
 } esp_peer_video_stream_info_t;
 
 /**
  * @brief  Audio stream information
  */
 typedef struct {
-    esp_peer_audio_codec_t codec;       /*!< Audio codec */
-    uint32_t               sample_rate; /*!< Audio sample rate */
-    uint8_t                channel;     /*!< Audio channel */
+    esp_peer_audio_codec_t  codec;       /*!< Audio codec */
+    uint32_t                sample_rate; /*!< Audio sample rate */
+    uint8_t                 channel;     /*!< Audio channel */
 } esp_peer_audio_stream_info_t;
 
 /**
  * @brief  Video frame information
  */
 typedef struct {
-    uint32_t pts;  /*!< Video frame presentation timestamp */
-    uint8_t *data; /*!< Video frame data pointer */
-    int      size; /*!< Video frame data size */
+    uint32_t  pts;  /*!< Video frame presentation timestamp */
+    uint8_t  *data; /*!< Video frame data pointer */
+    int       size; /*!< Video frame data size */
 } esp_peer_video_frame_t;
 
 /**
  * @brief  Audio frame information
  */
 typedef struct {
-    uint32_t pts;  /*!< Audio frame presentation timestamp */
-    uint8_t *data; /*!< Audio frame data pointer */
-    int      size; /*!< Audio frame data size */
+    uint32_t  pts;  /*!< Audio frame presentation timestamp */
+    uint8_t  *data; /*!< Audio frame data pointer */
+    int       size; /*!< Audio frame data size */
 } esp_peer_audio_frame_t;
 
 /**
  * @brief  Data frame information
  */
 typedef struct {
-    esp_peer_data_channel_type_t type;      /*!< Data channel type */
-    uint16_t                     stream_id; /*!< Data channel stream ID */
-    uint8_t                     *data;      /*!< Pointer to data to be sent through data channel */
-    int                          size;      /*!< Data size */
+    esp_peer_data_channel_type_t  type;      /*!< Data channel type */
+    uint16_t                      stream_id; /*!< Data channel stream ID */
+    uint8_t                      *data;      /*!< Pointer to data to be sent through data channel */
+    int                           size;      /*!< Data size */
 } esp_peer_data_frame_t;
 
 /**
@@ -173,12 +155,12 @@ typedef enum {
  * @brief  Configuration for peer data channel
  */
 typedef struct {
-    esp_peer_data_channel_reliable_type_t type;    /*!< Reliability type */
-    bool                                  ordered; /*!< true = ordered delivery, false = unordered */
-    char                                 *label;   /*!< Data channel label */
+    esp_peer_data_channel_reliable_type_t  type;    /*!< Reliability type */
+    bool                                   ordered; /*!< true = ordered delivery, false = unordered */
+    char                                  *label;   /*!< Data channel label */
     union {
-        uint16_t max_retransmit_count; /*!< Only valid if type is ESP_PEER_DATA_CHANNEL_PARTIAL_RELIABLE_RETX */
-        uint16_t max_packet_lifetime;  /*!< Only valid if type is ESP_PEER_DATA_CHANNEL_PARTIAL_RELIABLE_TIMEOUT (in milliseconds) */
+        uint16_t  max_retransmit_count; /*!< Only valid if type is ESP_PEER_DATA_CHANNEL_PARTIAL_RELIABLE_RETX */
+        uint16_t  max_packet_lifetime;  /*!< Only valid if type is ESP_PEER_DATA_CHANNEL_PARTIAL_RELIABLE_TIMEOUT (in milliseconds) */
     };
 } esp_peer_data_channel_cfg_t;
 

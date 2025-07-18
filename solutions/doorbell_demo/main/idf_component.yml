@@ -12,8 +12,6 @@ dependencies:
     path: ../../../components/esp_capture/src/impl/capture_audio_enc
   capture_video_enc:
     path: ../../../components/esp_capture/src/impl/capture_video_enc
-  peer_default:
-    path: ../../../components/esp_webrtc/impl/peer_default
   render_impl:
      path: ../../../components/av_render/render_impl
   espressif/esp_h264:

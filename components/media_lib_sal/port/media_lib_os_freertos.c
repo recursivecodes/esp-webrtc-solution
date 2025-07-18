@@ -40,7 +40,11 @@
 #include "esp_idf_version.h"
 
 #if CONFIG_FREERTOS_ENABLE_TASK_SNAPSHOT
+#if (ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 2, 0))
+#include "esp_private/freertos_debug.h"
+#else
 #include "freertos/task_snapshot.h"
+#endif
 #endif
 
 #ifdef __XTENSA__
@@ -77,7 +81,7 @@ static void *_malloc_in_heap(size_t size)
 }
 
 static void _free_in_heap(void *buf)
-{ 
+{
     heap_caps_free(buf);
 }
 
@@ -318,7 +322,7 @@ static int _enter_critical(void)
 }
 
 static int _leave_critical(void)
-{ 
+{
     return ESP_OK;
 }
 
