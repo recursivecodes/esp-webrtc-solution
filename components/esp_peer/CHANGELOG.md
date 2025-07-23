@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.2.2
+
+### Bug Fixes
+
+- Fixed build error for component name miss matched
+
 ## v1.2.1
 
 ### Features
