@@ -111,3 +111,9 @@ Board: ATOMS3_ECHO_BASE
 i2c: {sda: 38, scl: 39}
 i2s: {bclk: 8, ws: 6, dout: 5, din: 7}
 in_out: {codec: ES8311, pa: -1, pa_gain:6}
+
+Board: XIAO_ESP32S3_Sense
+i2c: {sda: 40, scl: 39}
+i2s: {mclk: -1, bclk: 42, din: 41, dout: -1}
+in: {codec: DUMMY}
+camera: {type: dvp, xclk: 10, pclk: 13, vsync: 38, href: 47, d0: 15, d1: 17, d2: 18, d3: 16, d4: 14, d5: 12, d6: 11, d7: 48}
