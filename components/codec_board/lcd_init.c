@@ -187,7 +187,9 @@ static int _init_spi_lcd(lcd_cfg_t *cfg)
     };
 #if SOC_SPI_SUPPORT_OCT
     if (cfg->spi_cfg.d[6] >= 0) {
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(6, 0, 0)
         io_config.flags.octal_mode = 1;
+#endif
         io_config.spi_mode = 3;
     }
 #endif
@@ -196,7 +198,9 @@ static int _init_spi_lcd(lcd_cfg_t *cfg)
     RETURN_ON_ERR(ret);
     esp_lcd_panel_dev_config_t panel_config = {
         .reset_gpio_num = get_hw_gpio(cfg->reset_pin),
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 3, 0)
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)
+        .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR,
+#elif ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 3, 0)
         .rgb_ele_order = ESP_LCD_COLOR_SPACE_BGR,
 #else
         .rgb_endian = LCD_RGB_ENDIAN_BGR,

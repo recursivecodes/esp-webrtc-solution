@@ -5,6 +5,7 @@
  * See LICENSE file for details.
  */
 
+#include "media_lib_os.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 
@@ -15,7 +16,7 @@
 
 #define WEAK __attribute__((weak))
 
-typedef void* media_lib_mutex_handle_t;
+
 
 // Mock memory allocation functions
 void* WEAK media_lib_malloc(size_t size)

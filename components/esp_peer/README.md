@@ -199,6 +199,8 @@ Ensure these config options are enabled:
 ```ini
 CONFIG_MBEDTLS_SSL_PROTO_DTLS=y
 CONFIG_MBEDTLS_SSL_DTLS_SRTP=y
+For IDFv6.0 need turn on following option also
+CONFIG_MBEDTLS_X509_CREATE_C=y
 ```
 
 ---

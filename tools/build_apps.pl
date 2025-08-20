@@ -36,13 +36,14 @@ sub filter_build {
     my @error_patterns = (
         qr/\b(error|warning)\b/i,
         qr/failed to build/i,
-        qr/link error/i
+        qr/link error/i,
+        qr/undefined reference/i,
     );
     while (my $line = <$fh>) {
         chomp $line;
         if (grep { $line =~ $_ } @error_patterns) {
             print colored($line, 'red'), "\n";
-        } 
+        }
     }
     close($fh);
 }

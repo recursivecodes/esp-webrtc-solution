@@ -14,10 +14,17 @@
 #include "esp_heap_trace.h"
 #include "esp_heap_caps.h"
 #include "sys_state.h"
+#include "esp_idf_version.h"
 
 #define TAG "SYS_STATE"
 
 #define NUM_RECORDS 500
+
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)
+#define get_task_start xTaskGetStackStart
+#else
+#define get_task_start pxTaskGetStackStart
+#endif
 
 #if (CONFIG_FREERTOS_VTASKLIST_INCLUDE_COREID && CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS)
 #include "esp_memory_utils.h"
@@ -65,7 +72,7 @@ static void show_threads()
                              (int)task_elapsed_time, (int)percentage_time, start_array[i].uxCurrentPriority,
                              (int)start_array[i].usStackHighWaterMark, task_state[(start_array[i].eCurrentState)],
                              start_array[i].xCoreID,
-                             task_stack[esp_ptr_internal(pxTaskGetStackStart(start_array[i].xHandle))]);
+                             task_stack[esp_ptr_internal(get_task_start(start_array[i].xHandle))]);
 
                     start_array[i].xHandle = NULL;
                     end_array[j].xHandle   = NULL;
