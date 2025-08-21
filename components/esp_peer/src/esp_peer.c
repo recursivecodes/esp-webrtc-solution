@@ -12,6 +12,7 @@
 typedef struct {
     esp_peer_ops_t    ops;
     esp_peer_handle_t handle;
+    esp_peer_cfg_t    cfg;  // Store config to access callbacks
 } peer_wrapper_t;
 
 int esp_peer_open(esp_peer_cfg_t *cfg, const esp_peer_ops_t *ops, esp_peer_handle_t *handle)
