@@ -25,6 +25,7 @@ int esp_peer_open(esp_peer_cfg_t *cfg, const esp_peer_ops_t *ops, esp_peer_handl
         return ESP_PEER_ERR_NO_MEM;
     }
     memcpy(&peer->ops, ops, sizeof(esp_peer_ops_t));
+    memcpy(&peer->cfg, cfg, sizeof(esp_peer_cfg_t));  // Store config for callback access
     int ret = ops->open(cfg, &peer->handle);
     if (ret != ESP_PEER_ERR_NONE) {
         free(peer);
@@ -100,6 +101,22 @@ int esp_peer_send_video(esp_peer_handle_t handle, esp_peer_video_frame_t *info)
         return ESP_PEER_ERR_INVALID_ARG;
     }
     peer_wrapper_t *peer = (peer_wrapper_t *)handle;
+
+    // Call the video send callback if provided (for SEI injection, etc.)
+    if (peer->cfg.on_video_send) {
+        uint8_t *modified_data = peer->cfg.on_video_send(info, peer->cfg.ctx);
+        if (modified_data == NULL) {
+            // Callback returned NULL - drop the frame
+            return ESP_PEER_ERR_NONE;
+        } else if (modified_data != info->data) {
+            // Callback returned modified data - update frame
+            // Note: Caller is responsible for memory management of modified_data
+            info->data = modified_data;
+            // Size might have changed - callback should update info->size if needed
+        }
+        // If modified_data == info->data, use original frame unchanged
+    }
+
     if (peer->ops.send_video) {
         return peer->ops.send_video(peer->handle, info);
     }
