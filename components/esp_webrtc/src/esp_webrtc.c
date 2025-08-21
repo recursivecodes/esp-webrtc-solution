@@ -537,6 +537,7 @@ static int pc_start(webrtc_t *rtc, esp_peer_ice_server_cfg_t *server_info, int s
         .on_channel_open = pc_on_channel_open,
         .on_channel_close = pc_on_channel_close,
         .on_data = pc_on_data,
+        .on_video_send = rtc->rtc_cfg.peer_cfg.on_video_send,  // Pass through video send callback
         .role = rtc->ice_role,
         .ctx = rtc,
     };
