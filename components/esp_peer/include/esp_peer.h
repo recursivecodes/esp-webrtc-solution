@@ -271,6 +271,17 @@ typedef struct {
      * @return          Status code indicating success or failure.
      */
     int (*on_channel_close)(esp_peer_data_channel_info_t *ch, void *ctx);
+    /**
+     * @brief  Peer video frame send callback (outgoing frames)
+     * @param[in]  frame  Video frame information before sending
+     * @param[in]  ctx    User context
+     * @return            Modified frame data or NULL to use original
+     * @note              This callback allows intercepting and modifying outgoing video frames
+     *                    Return the original frame->data to pass through unchanged
+     *                    Return modified data (caller must manage memory) to send modified frame
+     *                    Return NULL to drop the frame
+     */
+    uint8_t* (*on_video_send)(esp_peer_video_frame_t* frame, void* ctx);
 } esp_peer_cfg_t;
 
 /**
