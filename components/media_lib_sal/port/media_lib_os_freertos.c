@@ -63,6 +63,12 @@
 #endif
 #endif
 
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)
+#define get_task_start xTaskGetStackStart
+#else
+#define get_task_start pxTaskGetStackStart
+#endif
+
 #define RETURN_ON_NULL_HANDLE(h)                                               \
     if (h == NULL) {                                                           \
         return ESP_ERR_INVALID_ARG;                                            \
@@ -373,7 +379,7 @@ static int _get_stack_frame(void** addr, int n)
     TaskSnapshot_t snap_shot;
     TaskHandle_t cur_task = xTaskGetCurrentTaskHandle();
     vTaskGetSnapshot(cur_task, &snap_shot);
-    snap_shot.pxTopOfStack = pxTaskGetStackStart(cur_task);;
+    snap_shot.pxTopOfStack = get_task_start(cur_task);;
     esp_backtrace_get_start(&(frame.pc), &(frame.sp), &(frame.next_pc));
 
     for (int i = 0; i < n; i++) {
@@ -445,7 +451,7 @@ static int _get_stack_frame(void** addr, int n)
     TaskSnapshot_t snap_shot;
     TaskHandle_t cur_task = xTaskGetCurrentTaskHandle();
     vTaskGetSnapshot(cur_task, &snap_shot);
-    snap_shot.pxTopOfStack = pxTaskGetStackStart(cur_task);
+    snap_shot.pxTopOfStack = get_task_start(cur_task);
     asm volatile ("addi %0, sp, 0\n"
                   "auipc %1, 0\n"
                   "addi %1, %1, 0\n"

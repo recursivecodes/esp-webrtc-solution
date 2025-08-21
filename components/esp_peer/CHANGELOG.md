@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.2.3
+
+### Features
+
+- Added support for IDFv6.0
+- Added API `esp_peer_pre_generate_cert` for pre-generate DTLS key
+
+### Bug Fixes
+
+- Fixed build error on IDFv6.0
+- Make DTLS module to be open source
+- Fixed data channel role not follow DTLS role
+
 ## v1.2.2
 
 ### Bug Fixes

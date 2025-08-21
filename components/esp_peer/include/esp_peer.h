@@ -567,6 +567,25 @@ int esp_peer_query(esp_peer_handle_t peer);
  */
 int esp_peer_close(esp_peer_handle_t peer);
 
+/**
+ * @brief  Pre-generates cryptographic materials for DTLS handshake to optimize connection establishment
+ *
+ * @note  This function generates and caches X.509 certificates and associated private keys
+ *          that will be used for subsequent DTLS handshakes. Pre-generation is recommended
+ *          because:
+ *          - Cryptographic operations during runtime can significantly delay connection establishment
+ *          - Certificate generation is computationally intensive
+ *          - Reusing pre-generated materials maintains security while improving performance
+ *       Important considerations:
+ *       - Generated materials are stored in internal memory and persist until reset
+ *       - Each call overwrites any previously generated materials
+ *
+ * @return
+ *       - ESP_PEER_ERR_NONE  On success
+ *       - Others             Failed to generate
+ */
+int esp_peer_pre_generate_cert(void);
+
 #ifdef __cplusplus
 }
 #endif

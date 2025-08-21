@@ -75,8 +75,9 @@ static int dvp_src_get_support_codecs(esp_capture_video_src_if_t *src, const esp
 {
     static esp_capture_codec_type_t dvp_codecs[] = {
         ESP_CAPTURE_CODEC_TYPE_MJPEG,
-        ESP_CAPTURE_CODEC_TYPE_YUV422P,
+        ESP_CAPTURE_CODEC_TYPE_YUV422,
         ESP_CAPTURE_CODEC_TYPE_YUV420,
+        ESP_CAPTURE_CODEC_TYPE_RGB565,
     };
     *codecs = dvp_codecs;
     *num = sizeof(dvp_codecs) / sizeof(dvp_codecs[0]);
@@ -142,7 +143,7 @@ static int dvp_src_negotiate_caps(esp_capture_video_src_if_t *src, esp_capture_v
     }
     if (in_cap->codec == ESP_CAPTURE_CODEC_TYPE_MJPEG) {
         camera_config.pixel_format = PIXFORMAT_JPEG;
-    } else if (in_cap->codec == ESP_CAPTURE_CODEC_TYPE_YUV422P || in_cap->codec == ESP_CAPTURE_CODEC_TYPE_YUV420) {
+    } else if (in_cap->codec == ESP_CAPTURE_CODEC_TYPE_YUV422 || in_cap->codec == ESP_CAPTURE_CODEC_TYPE_YUV420) {
         camera_config.pixel_format = PIXFORMAT_YUV422;
         if (in_cap->codec == ESP_CAPTURE_CODEC_TYPE_YUV420) {
             dvp_src->need_convert_420 = true;

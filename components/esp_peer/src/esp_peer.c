@@ -8,6 +8,7 @@
 #include "esp_peer.h"
 #include <stdlib.h>
 #include <string.h>
+#include "dtls_srtp.h"
 
 typedef struct {
     esp_peer_ops_t    ops;
@@ -178,4 +179,10 @@ int esp_peer_close(esp_peer_handle_t handle)
     }
     free(peer);
     return ret;
+}
+
+int esp_peer_pre_generate_cert(void)
+{
+    int ret = dtls_srtp_gen_cert();
+    return ret == 0 ? ESP_PEER_ERR_NONE : ESP_PEER_ERR_FAIL;
 }

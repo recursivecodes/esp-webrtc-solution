@@ -5,7 +5,7 @@ dependencies:
       - if: "target in [esp32p4]"
 
   espressif/esp32-camera:
-    version: "~2.0.15"
+    version: "~2.1"
     rules:
       - if: "target in [esp32s3,esp32s2,esp32]"
   esp_capture:
