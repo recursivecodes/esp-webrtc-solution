@@ -144,6 +144,11 @@ static int extract_ice_info(whip_signaling_t *sig, char *link)
     if (sig->server_num > MAX_SERVER_SUPPORT) {
         return ESP_PEER_ERR_OVER_LIMITED;
     }
+    // Check if this Link header is for an ICE server
+    if (strstr(link, "rel=\"ice-server\"") == NULL) {
+        ESP_LOGD(TAG, "Skip link not for ICE server: %s", link);
+        return ESP_PEER_ERR_NONE;
+    }
     esp_peer_ice_server_cfg_t server_cfg = {};
     char *start, *end;
     start = strstr(link, "<");
@@ -155,6 +160,7 @@ static int extract_ice_info(whip_signaling_t *sig, char *link)
         return ESP_PEER_ERR_INVALID_ARG;
     }
     *end = '\0'; // Terminate the URL
+
     server_cfg.stun_url = strdup(start + 1);
     *end = '>';
     start = end + 1;
@@ -228,13 +234,13 @@ static int whip_signaling_send_msg(esp_peer_signaling_handle_t h, esp_peer_signa
             }
             sig->local_sdp_sent = true;
             if (sig->server_num) {
-                // update ice_info
-                esp_peer_signaling_ice_info_t iec_info = {
+                // Update ice_info
+                esp_peer_signaling_ice_info_t ice_info = {
                     .is_initiator = true,
                     .server_info = *sig->ice_servers[0],
                 };
                 // TODO support more servers?
-                sig->cfg.on_ice_info(&iec_info, sig->cfg.ctx);
+                sig->cfg.on_ice_info(&ice_info, sig->cfg.ctx);
             }
             // Try to extractor stun lists
             esp_peer_signaling_msg_t sdp_msg = {
